@@ -10,7 +10,7 @@ fun main() {
 
     //testFirst()
     //testVector()
-    //testComplex()
+    testComplex()
 
     // Lambda testing //
 
