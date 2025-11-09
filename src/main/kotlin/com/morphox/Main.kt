@@ -1,14 +1,20 @@
 package com.morphox
 
+import com.morphox.data.*
 import com.morphox.math.*
-import javax.print.DocFlavor
-import kotlin.math.PI
+
+import kotlin.math.*
 
 fun main() {
+    testVectorDatabase()
+
     //testFirst()
     //testVector()
     //testComplex()
-    testLambda1 {
+
+    // Lambda testing //
+
+    /*testLambda1 {
         println("hello")
 
         return@testLambda1
@@ -24,7 +30,29 @@ fun main() {
         test("hello world") { msg ->
             println(msg)
         }
-    }
+    }*/
+}
+
+// Vector Database concept maybe? //
+fun testVectorDatabase() {
+    val db = VectorDb()
+    db.add("Black", 0, 0, 0)
+    db.add("White", 255, 255, 255)
+
+    db.add("Red", 255, 0, 0)
+    db.add("Green", 0, 255, 0)
+    db.add("Blue", 0, 0, 255)
+
+    db.add("Yellow", 255, 255, 0)
+    db.add("Magenta", 255, 0, 255)
+    db.add("Cyan", 0, 255, 255)
+
+    println(db.find(255, 255, 255)) // White
+    println(db.find(255, 127, 255)) // Magenta
+    println(db.find(127, 127, 255)) // Blue
+    println(db.find(127, 128, 127)) // Green
+    println(db.find(127, 127, 127)) // Black
+    println(db.find(128, 128, 128)) // White
 }
 
 // Messing around with Kotlin some more
@@ -105,4 +133,10 @@ fun testFirst() {
             println("mmmmm...")
         }
     }
+
+    fun Int.hello() {
+        println(this)
+    }
+
+    12345.hello()
 }

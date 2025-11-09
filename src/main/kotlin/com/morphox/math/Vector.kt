@@ -4,11 +4,11 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
-class Vector(values: Array<Double>) {
+class Vector(vararg values: Number) {
     val axes: Int = values.size
-    val values: Array<Double> = values
+    val values: Array<Double> = values.map { it.toDouble() }.toTypedArray()
 
-    constructor(vararg values: Double) : this(values.toTypedArray())
+    constructor(values: Array<Double>) : this(*values)
     constructor(axes: Int) : this(Array<Double>(axes) { 0.0 })
 
     fun mag(): Double {
@@ -39,6 +39,24 @@ class Vector(values: Array<Double>) {
         }
 
         return dot;
+    }
+
+    fun distTo(other: Vector): Double {
+        val size = max(this.axes, other.axes)
+        var sum = 0.0
+
+        for (index in 0..<size) {
+            var sub = 0.0;
+
+            if (index < this.axes)
+                sub = this[index]
+            if (index < other.axes)
+                sub -= other[index]
+
+            sum += sub * sub
+        }
+
+        return sqrt(sum)
     }
 
     fun clone(): Vector {
