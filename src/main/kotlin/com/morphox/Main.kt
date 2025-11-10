@@ -2,15 +2,18 @@ package com.morphox
 
 import com.morphox.data.*
 import com.morphox.math.*
+import com.morphox.rabbit.RMQClient
+import kotlinx.coroutines.runBlocking
 
 import kotlin.math.*
 
-fun main() {
+fun main() = runBlocking {
     testVectorDatabase()
+    testRabbitMQ()
 
     //testFirst()
     //testVector()
-    testComplex()
+    //testComplex()
 
     // Lambda testing //
 
@@ -30,7 +33,42 @@ fun main() {
         test("hello world") { msg ->
             println(msg)
         }
-    }*/
+    }
+    */
+}
+
+fun testRabbitMQ() {
+    RMQClient("rmq", 5672).use { // Connect to RabbitMQ
+        if (!it.connect("logs", "log_queue", "logs"))
+        {
+            println("Failed to connect to RabbitMQ")
+            return
+        }
+
+        println("Connected!")
+
+        // Listen to event
+        it.onReceive { msg: String ->
+            println("[Consumer1] Received: $msg")
+            return@onReceive true
+        }
+        it.onReceive { msg: String ->
+            println("[Consumer2] Received: $msg")
+            return@onReceive true
+        }
+        it.onReceive { msg: String ->
+            println("[Consumer3] Received: $msg")
+            return@onReceive true
+        }
+
+        // Continuously publish to a RabbitMQ event
+        while (true) {
+            println("Publishing message")
+            it.publish("Hello from Kotlin!")
+            Thread.sleep(500)
+        }
+        // client.close() // kinda useless atm
+    }
 }
 
 // Vector Database concept maybe? //
@@ -139,4 +177,8 @@ fun testFirst() {
     }
 
     12345.hello()
+
+    repeat(3, {
+        println("hello there")
+    })
 }

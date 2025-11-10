@@ -1,0 +1,75 @@
+services:
+  rmq:
+    image: "rabbitmq:3-management"
+    container_name: "rmq"
+    networks:
+      - morphNet
+    ports:
+        - "5672:5672"
+        - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    volumes:
+        - "rmq_data:/var/lib/rabbitmq"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+  broker:
+    image: apache/kafka:latest
+    container_name: broker
+    networks:
+      - morphNet
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://localhost:9092,CONTROLLER://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+    volumes:
+      - "kafka_data:/var/lib/kafka"
+
+  redis:
+    image: redis:latest
+    container_name: redis-server
+    restart: unless-stopped
+    networks:
+      - morphNet
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - "redis_data:/var/lib/redis"
+
+    command: [ "redis-server", "--appendonly", "yes" ]
+
+  main:
+    networks:
+      - morphNet
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: "main-program"
+    depends_on:
+      rmq:
+        condition: service_healthy
+
+volumes:
+  rmq_data:
+  kafka_data:
+  redis_data:
+    driver: local
+
+networks:
+  morphNet:
+    driver: bridge
