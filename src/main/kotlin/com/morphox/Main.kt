@@ -2,39 +2,34 @@ package com.morphox
 
 import com.morphox.data.*
 import com.morphox.math.*
-import com.morphox.rabbit.RMQClient
+import com.morphox.rabbit.*
+
+import redis.clients.jedis.Jedis
 import kotlinx.coroutines.runBlocking
 
 import kotlin.math.*
 
 fun main() = runBlocking {
     testVectorDatabase()
+    testRedis()
     testRabbitMQ()
 
     //testFirst()
     //testVector()
     //testComplex()
+    //testLambdas()
+}
 
-    // Lambda testing //
+fun testRedis() {
+    Jedis("redis-server", 6379).use { jedis ->
+        println("Connected to redis!")
 
-    /*testLambda1 {
-        println("hello")
+        jedis.set("language", "Kotlin")
 
-        return@testLambda1
+        val value = jedis.get("language")
+
+        println("Read written value: $value")
     }
-    val returned = testLambda2 { message ->
-        "Returned value, $message"
-        //return@testLambda2 "Returned value, $message" // Alternative
-    }
-    println(returned)
-
-    val la = Lambda()
-    la.setup {
-        test("hello world") { msg ->
-            println(msg)
-        }
-    }
-    */
 }
 
 fun testRabbitMQ() {
@@ -65,7 +60,7 @@ fun testRabbitMQ() {
         while (true) {
             println("Publishing message")
             it.publish("Hello from Kotlin!")
-            Thread.sleep(500)
+            Thread.sleep(5000)
         }
         // client.close() // kinda useless atm
     }
@@ -101,6 +96,26 @@ fun testLambda2(func: (String) -> String): String {
 // Messing around with Kotlin some more
 fun testLambda1(func: () -> Unit) {
     func()
+}
+
+fun testLambdas() {
+    testLambda1 {
+        println("hello")
+
+        return@testLambda1
+    }
+    val returned = testLambda2 { message ->
+        "Returned value, $message"
+        //return@testLambda2 "Returned value, $message" // Alternative
+    }
+    println(returned)
+
+    val la = Lambda()
+    la.setup {
+        test("hello world") { msg ->
+            println(msg)
+        }
+    }
 }
 
 fun testComplex() {

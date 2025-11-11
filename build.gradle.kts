@@ -14,9 +14,10 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("com.rabbitmq:amqp-client:5.20.0")
     implementation("ch.qos.logback:logback-classic:1.4.14")
+    implementation("com.rabbitmq:amqp-client:5.20.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("redis.clients:jedis:5.1.2")
 }
 
 application {
